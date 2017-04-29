@@ -3,8 +3,8 @@
 # during compilation, packaging, distribution, etc.
 #
 version: 1.0.0
-apiversion: 3
-architectures: armeabi-v7a x86
+apiversion: 2
+architectures: armeabi armeabi-v7a x86
 description: a2dp
 author: Rainer Knöterich
 license: Specify your license
@@ -15,4 +15,4 @@ name: a2dp
 moduleid: de.appwerft.a2dp
 guid: da6fcb7f-b847-4aad-94e0-bef58b6dd759
 platform: android
-minsdk: 6.0.3.GA
+minsdk: 5.0.0.GA

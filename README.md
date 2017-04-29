@@ -11,6 +11,8 @@ With this Appcelerator Titanium module you can connect with  previously paired A
 
 ## Usage
 
+### List all devices:
+
 ```javascript
 var A2DP = require("de.appwerft.a2dp");
 
@@ -19,7 +21,41 @@ A2DP.addEventListener("load",function(res){
     // print the list of availabe BT devices:
     console.log(res.devices);
 });
+```
+Typical answer:
+```javascript
+[{
+"address" : "08:DF:1F:C6:58:01",
+"name" : "Bose Mini II SoundLink",
+"class" : "240414",
+"type" : 1
+}, {
+"address" : "34:4D:F7:A7:5C:0C",
+"name" : "G Watch 1887",
+"class" : "a0704",
+"type" : 3
+}, {
+"address" : "5C:EB:68:21:C1:4A",
+"name" : "MAJOR II BLUETOOTH",
+"class" : "240404",
+"type" : 1
+}, {
+"address" : "80:E4:DA:72:74:44",
+"name" : "f022cnRE",
+"class" : "1f00",
+"type" : 2
+}, {
+"address" : "40:EF:4C:C1:5D:DD",
+"name" : "STANMORE Speaker",
+"class" : "240414",
+"type" : 1
+}]
+```
 
+
+### Connect
+
+```javascript
 A2DP.connect(DEVICE_NAME);
 A2DP.disconnect(DEVICE_NAME);
 

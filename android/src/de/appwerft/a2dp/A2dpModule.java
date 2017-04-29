@@ -9,10 +9,14 @@
 package de.appwerft.a2dp;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
 
 import android.bluetooth.BluetoothA2dp;
@@ -23,9 +27,7 @@ import android.content.Context;
 
 @Kroll.module(name = "A2dp", id = "de.appwerft.a2dp")
 public class A2dpModule extends KrollModule {
-
-	// Standard Debugging variables
-	private static final String LCAT = "A2DP";
+	private static final String LCAT = "TiA2DP";
 	private Context ctx = TiApplication.getInstance().getApplicationContext();
 	BluetoothAdapter btAdapter;
 
@@ -33,10 +35,16 @@ public class A2dpModule extends KrollModule {
 		super();
 	}
 
+	@Kroll.onAppCreate
+	public static void onAppCreate(TiApplication app) {
+		Log.d(LCAT, "onAppCreate ====>");
+	}
+
 	private BluetoothProfile.ServiceListener profileListener = new BluetoothProfile.ServiceListener() {
 		BluetoothA2dp mBluetoothSpeaker;
 
 		public void onServiceConnected(int profile, BluetoothProfile proxy) {
+			Log.d(LCAT, proxy.toString());
 			if (profile == BluetoothProfile.A2DP) {
 				// can be cast to a BluetoothA2dp instance
 				mBluetoothSpeaker = (BluetoothA2dp) proxy;
@@ -46,24 +54,30 @@ public class A2dpModule extends KrollModule {
 					Method connect = BluetoothA2dp.class.getDeclaredMethod(
 							"connect", BluetoothDevice.class);
 					Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
-
+					Log.d(LCAT,
+							"======================== List of a2dp devices ============");
+					KrollDict result = new KrollDict();
+					List<KrollDict> list = new ArrayList<KrollDict>();
+					for (BluetoothDevice device : devices) {
+						KrollDict d = new KrollDict();
+						d.put("name", device.getName());
+						d.put("address", device.getAddress());
+						d.put("type", device.getType());
+						d.put("class", device.getBluetoothClass().toString());
+						list.add(d);
+					}
+					Log.d(LCAT, list.toString());
+					result.put("devices", list.toArray());
+					if (hasListeners("ready")) {
+						fireEvent("ready", result);
+					}
 				} catch (NoSuchMethodException | SecurityException e) {
 					e.printStackTrace();
 				}
-
+				// http://stackoverflow.com/questions/5171248/programmatically-connect-to-paired-bluetooth-device
 				// no devices are connected
 				List<BluetoothDevice> connectedDevices = mBluetoothSpeaker
 						.getConnectedDevices();
-
-				// the one paired (and disconnected) speaker is returned here
-				int[] statesToCheck = { BluetoothA2dp.STATE_DISCONNECTED };
-				List<BluetoothDevice> disconnectedDevices = mBluetoothSpeaker
-						.getDevicesMatchingConnectionStates(statesToCheck);
-
-				BluetoothDevice btSpeaker = disconnectedDevices.get(0);
-
-				// WHAT NOW?
-
 			}
 		}
 
@@ -75,10 +89,20 @@ public class A2dpModule extends KrollModule {
 	};
 
 	@Kroll.method
-	protected void startScan() {
-		// Get an instance of the BluetoothAdapter
+	public void startScan() {
+		Log.d(LCAT, "startScan");
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
 		// Using this instance, get a profile proxy for A2DP
 		btAdapter.getProfileProxy(ctx, profileListener, BluetoothProfile.A2DP);
+	}
+
+	@Kroll.method
+	public void connect(String name) {
+
+	}
+
+	@Kroll.method
+	public void disconnect(String name) {
+
 	}
 }
