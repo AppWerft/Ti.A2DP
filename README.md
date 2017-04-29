@@ -5,7 +5,6 @@ With this Appcelerator Titanium module you can connect with  previously paired A
 
 ## Permissions
 ```xml
-/* Manifest permissions */
 <uses-permission android:name="android.permission.BLUETOOTH"/>
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 ```
@@ -21,7 +20,7 @@ A2DP.addEventListener("load",function(res){
     console.log(res.devices);
 });
 
-A2DP.connect(DEVCENAME);
-A2DP.disconnect(DEVCENAME);
+A2DP.connect(DEVICE_NAME);
+A2DP.disconnect(DEVICE_NAME);
 
 ```
