@@ -25,6 +25,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.media.AudioManager;
 
 @Kroll.module(name = "A2dp", id = "de.appwerft.a2dp")
 public class A2dpModule extends KrollModule {
@@ -81,6 +82,7 @@ public class A2dpModule extends KrollModule {
 										.equals("1f00")) {
 							KrollDict d = new KrollDict();
 							d.put("name", device.getName());
+							d.put("bondstate", device.getBondState());
 							d.put("address", device.getAddress());
 							d.put("type", device.getType());
 							list.add(d);
@@ -122,6 +124,18 @@ public class A2dpModule extends KrollModule {
 
 		// Using this instance, get a profile proxy for A2DP
 		btAdapter.getProfileProxy(ctx, profileListener, BluetoothProfile.A2DP);
+	}
+
+	@Kroll.method
+	public void start(KrollDict opts) {
+		startScan(opts);
+	}
+
+	@Kroll.method
+	public boolean isActive() {
+		AudioManager audioManager = (AudioManager) ctx
+				.getSystemService(Context.AUDIO_SERVICE);
+		return (audioManager.isBluetoothA2dpOn());
 	}
 
 	@Kroll.method

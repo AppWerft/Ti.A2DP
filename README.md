@@ -66,6 +66,13 @@ Typical answer:
 - [x]  BOND_BONDING
 - [x]  BOND_NONE
 
+### Test if A2DP active
+```javascript
+A2DP.isActive();
+```
+
+
+
 ### Connect
 
 ```javascript
