@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
@@ -29,7 +30,23 @@ import android.content.Context;
 public class A2dpModule extends KrollModule {
 	private static final String LCAT = "TiA2DP";
 	private Context ctx = TiApplication.getInstance().getApplicationContext();
-	BluetoothAdapter btAdapter;
+	BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+	@Kroll.constant
+	final static int DEVICE_TYPE_CLASSIC = BluetoothDevice.DEVICE_TYPE_CLASSIC;
+	@Kroll.constant
+	final static int DEVICE_TYPE_DUAL = BluetoothDevice.DEVICE_TYPE_DUAL;
+	@Kroll.constant
+	final static int DEVICE_TYPE_LE = BluetoothDevice.DEVICE_TYPE_LE;
+	@Kroll.constant
+	final static int DEVICE_TYPE_UNKNOWN = BluetoothDevice.DEVICE_TYPE_UNKNOWN;
+	@Kroll.constant
+	final static int BOND_BONDED = BluetoothDevice.BOND_BONDED;
+	@Kroll.constant
+	final static int BOND_BONDING = BluetoothDevice.BOND_BONDING;
+	@Kroll.constant
+	final static int BOND_NONE = BluetoothDevice.BOND_NONE;
+	private KrollFunction onReady;
+	private int type = DEVICE_TYPE_UNKNOWN;
 
 	public A2dpModule() {
 		super();
@@ -59,17 +76,24 @@ public class A2dpModule extends KrollModule {
 					KrollDict result = new KrollDict();
 					List<KrollDict> list = new ArrayList<KrollDict>();
 					for (BluetoothDevice device : devices) {
-						KrollDict d = new KrollDict();
-						d.put("name", device.getName());
-						d.put("address", device.getAddress());
-						d.put("type", device.getType());
-						d.put("class", device.getBluetoothClass().toString());
-						list.add(d);
+						if (device.getType() == type
+								&& !device.getBluetoothClass().toString()
+										.equals("1f00")) {
+							KrollDict d = new KrollDict();
+							d.put("name", device.getName());
+							d.put("address", device.getAddress());
+							d.put("type", device.getType());
+							list.add(d);
+						}
 					}
-					Log.d(LCAT, list.toString());
+
 					result.put("devices", list.toArray());
 					if (hasListeners("ready")) {
 						fireEvent("ready", result);
+					}
+					if (onReady != null) {
+						Log.d(LCAT, "send back to JS");
+						onReady.call(getKrollObject(), result);
 					}
 				} catch (NoSuchMethodException | SecurityException e) {
 					e.printStackTrace();
@@ -89,11 +113,20 @@ public class A2dpModule extends KrollModule {
 	};
 
 	@Kroll.method
-	public void startScan() {
-		Log.d(LCAT, "startScan");
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
+	public void startScan(KrollDict opts) {
+		if (opts.containsKeyAndNotNull("type"))
+			type = opts.getInt("type");
+
+		if (opts.containsKeyAndNotNull("change"))
+			onReady = (KrollFunction) opts.get("change");
+
 		// Using this instance, get a profile proxy for A2DP
 		btAdapter.getProfileProxy(ctx, profileListener, BluetoothProfile.A2DP);
+	}
+
+	@Kroll.method
+	public void stop() {
+		btAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
 
 	@Kroll.method

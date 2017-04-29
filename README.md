@@ -51,7 +51,20 @@ Typical answer:
 "type" : 1
 }]
 ```
+### Constants
 
+#### Device types
+- [x] DEVICE_TYPE_CLASSIC   Bluetooth device type, Classic - BR/EDR devices 
+- [x] DEVICE_TYPE_DUAL      Bluetooth device type, Dual Mode - BR/EDR/LE 
+- [x] DEVICE_TYPE_LE        Bluetooth device type, Low Energy - LE-only 
+- [x] DEVICE_TYPE_UNKNOWN
+
+
+#### Bond state
+@Kroll.constant
+- [x]  BOND_BONDED
+- [x]  BOND_BONDING
+- [x]  BOND_NONE
 
 ### Connect
 
