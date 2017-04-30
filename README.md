@@ -26,12 +26,14 @@ The result can be:
 
 In case two you can:
 ```javascript
-var BT = require("de.appwerft.a2dp").Bluetooth.enableBluetooth(); // needs permission, without arguments
+var BT = require("de.appwerft.a2dp");
+BT.Bluetooth.enableBluetooth(); // needs permission, without arguments
 ```
 Or:
 In case two you can:
 ```javascript
-var BT = require("de.appwerft.a2dp").Bluetooth.enableBluetooth({
+var BT = require("de.appwerft.a2dp");
+BT.Bluetooth.enableBluetooth({
 	onsuccess : function(){},
 	onerror : function(){}
 }); 
