@@ -34,13 +34,13 @@ In case two you can:
 ```javascript
 var BT = require("de.appwerft.a2dp");
 BT.Bluetooth.enableBluetooth({
-	onsuccess : function(){},
+	onsuccess : function(){}, // result is name and address of BT on device
 	onerror : function(){}
 }); 
 ```
+This opens a system dialog and the user can grant (or not)
 
 ### A2DP active?
-
 
 ```javascript
 var A2DP = require("de.appwerft.a2dp");
