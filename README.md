@@ -8,21 +8,61 @@ With this Appcelerator Titanium module you can connect with  previously paired A
 <uses-permission android:name="android.permission.BLUETOOTH"/>
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 ```
+The second permission you only need, if you want enable BT without interaction with user.
 
 ## Usage
+
+### Availibility
+
+```javascript
+var BT = require("de.appwerft.a2dp").Bluetooth;
+var state = BT.getAvailibility();
+```
+The result can be:
+
+- [x] BT_NOTAVAILABLE 
+- [x] BT_DISABLED
+- [x] BT_ENABLED 
+
+In case two you can:
+```javascript
+var BT = require("de.appwerft.a2dp").Bluetooth.enableBluetooth(); // needs permission, without arguments
+```
+Or:
+In case two you can:
+```javascript
+var BT = require("de.appwerft.a2dp").Bluetooth.enableBluetooth({
+	onsuccess : function(){},
+	onerror : function(){}
+}); 
+```
+
+### A2DP active?
+
+
+```javascript
+var A2DP = require("de.appwerft.a2dp");
+A2DP.isBluetoothA2dpOn();
+```
+If `true` the device is connected with least one device.
 
 ### List all devices:
 
 ```javascript
 var A2DP = require("de.appwerft.a2dp");
-A2DP.startScan();
-
 if (A2DP.init() {
-    A2DP.addEventListener("load",function(res){
-        // print the list of availabe BT devices:
-        console.log(res.devices);
+    A2DP.startScanPairedDevices({
+    	repeat : true,
+        onchanged : function(res) {
+        }
     });
+    A2DP.startScanNearbyDevices({
+        onchanged : function(res) {
+        }
+    });
+
 }
+
 ```
 Typical answer:
 ```javascript
