@@ -15,12 +15,14 @@ With this Appcelerator Titanium module you can connect with  previously paired A
 
 ```javascript
 var A2DP = require("de.appwerft.a2dp");
-
 A2DP.startScan();
-A2DP.addEventListener("load",function(res){
-    // print the list of availabe BT devices:
-    console.log(res.devices);
-});
+
+if (A2DP.init() {
+    A2DP.addEventListener("load",function(res){
+        // print the list of availabe BT devices:
+        console.log(res.devices);
+    });
+}
 ```
 Typical answer:
 ```javascript
@@ -76,7 +78,7 @@ A2DP.isActive();
 ### Connect
 
 ```javascript
-A2DP.connect(DEVICE_NAME);
-A2DP.disconnect(DEVICE_NAME);
+A2DP.connectTo(DEVICE_NAME);
+A2DP.disconnectFrom(DEVICE_NAME);
 
 ```
