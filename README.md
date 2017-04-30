@@ -15,8 +15,8 @@ The second permission you only need, if you want enable BT without interaction w
 ### Availibility
 
 ```javascript
-var BT = require("de.appwerft.a2dp").Bluetooth;
-var state = BT.getAvailibility();
+var BT = require("de.appwerft.a2dp");
+var state = BT.Bluetooth.getAvailibility();
 ```
 The result can be:
 
