@@ -30,9 +30,7 @@ public class PairedDevices extends ArrayList {
 
 	public void setConnected(BluetoothDevice device, boolean state) {
 		int ndx = getDeviceIndex(device);
-		if (ndx != NOTFOUND) {
-			devices.get(ndx);
-		}
+
 	}
 
 	private int getDeviceIndex(BluetoothDevice device) {

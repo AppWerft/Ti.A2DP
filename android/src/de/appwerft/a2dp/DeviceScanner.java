@@ -16,6 +16,7 @@ public final class DeviceScanner implements BluetoothProfile.ServiceListener {
 	BluetoothA2dp mBluetoothSpeaker;
 	private A2dpModule module;
 	private final String LCAT = A2dpModule.LCAT;
+	int lastHashcode;
 
 	public DeviceScanner(A2dpModule module) {
 		this.module = module;
@@ -60,8 +61,11 @@ public final class DeviceScanner implements BluetoothProfile.ServiceListener {
 			result.put("devices", list.toArray());
 
 			if (module.onReady != null) {
-
-				module.onReady.call(module.getKrollObject(), result);
+				int hashCode = result.hashCode();
+				if (hashCode != lastHashcode) {
+					lastHashcode = hashCode;
+					module.onReady.call(module.getKrollObject(), result);
+				}
 			}
 
 			// http://stackoverflow.com/questions/5171248/programmatically-connect-to-paired-bluetooth-device
