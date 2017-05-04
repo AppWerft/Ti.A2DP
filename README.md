@@ -2,6 +2,7 @@
 
 With this Appcelerator Titanium module you can connect with  previously paired A2DP Bluetooth Speaker.
    
+<img src="https://lh3.googleusercontent.com/lzwkwz59Y6mjumoGkShqG3adVvDsAW8wFhuo3JOXyz6iWyxWHLmHS1jJXK_Ori2gfQ=h900" width=240 /> 
 
 ## Permissions
 ```xml
