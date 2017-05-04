@@ -28,6 +28,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
+import android.os.Looper;
 
 @Kroll.module(name = "A2dp", id = "de.appwerft.a2dp")
 public class A2dpModule extends KrollModule {
@@ -59,22 +60,29 @@ public class A2dpModule extends KrollModule {
 	public KrollFunction onReady;
 	public int type = DEVICE_TYPE_UNKNOWN;
 
-	List<KrollDict> pairedDevices = new ArrayList<KrollDict>();
+	Runnable cronJob;
+	Handler handler = new Handler(Looper.getMainLooper());
+	protected PairedDevices pairedDevices = PairedDevices.getInstance();
+	protected DiscoveryNearbyDevicesModule discoveryNearbyDevices = new DiscoveryNearbyDevicesModule();
+
+	/*
+	 * class CallBackImpl implements CallBack { public void methodToCallBack() {
+	 * System.out.println("I've been called back"); } }
+	 */
 
 	public A2dpModule() {
 		super();
+		pairedDevices.setModule(this);
+		DiscoveryNearbyDevicesModule.setModule(this);
 	}
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
-		Log.d(LCAT, "onAppCreate ====>");
 	}
 
 	// private BluetoothProfile.ServiceListener deviceScanner = new
 	// DeviceScanner(
 	// this);
-
-	Timer cron = new Timer();
 
 	@Kroll.method
 	public void startMonitorPairedDevices(KrollDict opts) {
@@ -86,35 +94,15 @@ public class A2dpModule extends KrollModule {
 
 		if (opts.containsKeyAndNotNull("onchanged"))
 			onReady = (KrollFunction) opts.get("onchanged");
-		Log.d(LCAT, "try start cron");
-
-		/*
-		 * cron.scheduleAtFixedRate(new TimerTask() {
-		 * 
-		 * @Override public void run() { btAdapter.getProfileProxy(ctx, new
-		 * DeviceScanner( A2dpModule.this), BluetoothProfile.A2DP); } }, 100,
-		 * 1024);
-		 */
-
-		final Handler handler = new Handler();
-
-		TimerTask timertask = new TimerTask() {
+		cronJob = new Runnable() {
 			@Override
 			public void run() {
-				handler.post(new Runnable() {
-					public void run() {
-						try {
-							Log.d(LCAT, "tickcron");
-							btAdapter.getProfileProxy(ctx, new DeviceScanner(
-									A2dpModule.this), BluetoothProfile.A2DP);
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-						}
-					}
-				});
+				btAdapter.getProfileProxy(ctx, new BondedDevicesScanner(
+						A2dpModule.this), BluetoothProfile.A2DP);
+				handler.postDelayed(this, 1200);
 			}
 		};
-		cron.schedule(timertask, 0, 1500); // execute in every 1.5sec
+		handler.post(cronJob);
 
 		/*
 		 * ctx.registerReceiver(MonitorBondedDevicesr, new IntentFilter(
@@ -130,10 +118,9 @@ public class A2dpModule extends KrollModule {
 	}
 
 	private void tearDown() {
-		Log.d(LCAT, "TearDown main module from A2DP !!!!!!!!!!!!!!!!!!!!!!!");
-		if (cron != null)
-			cron.purge();
-
+		handler.removeCallbacks(cronJob);
+		if (pairedDevices != null)
+			PairedDevices.resetList();
 		if (btAdapter != null && btAdapter.isDiscovering())
 			btAdapter.cancelDiscovery();
 	}
@@ -163,7 +150,7 @@ public class A2dpModule extends KrollModule {
 	@Override
 	public void onResume(Activity activity) {
 		super.onResume(activity);
-		cron = new Timer();
+
 	}
 
 	@Override

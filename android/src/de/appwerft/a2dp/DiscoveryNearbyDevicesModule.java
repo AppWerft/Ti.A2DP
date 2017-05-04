@@ -8,6 +8,9 @@
  */
 package de.appwerft.a2dp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -25,51 +28,80 @@ import de.appwerft.a2dp.utils.KrollCallbacks;
 
 @Kroll.module(parentModule = A2dpModule.class)
 public class DiscoveryNearbyDevicesModule extends KrollModule {
-	final static int REQUEST_CODE = 2;
-	final static String LCAT = A2dpModule.LCAT;
-	private Context ctx = TiApplication.getInstance().getApplicationContext();
-	BluetoothAdapter btAdapter;
-	KrollCallbacks callbacks;
+	long startTime;
+	List<BluetoothDevice> deviceList = new ArrayList<BluetoothDevice>();
 
-	private final BroadcastReceiver discoveryResult = new BroadcastReceiver() {
+	private final class DiscoveryResultHandler extends BroadcastReceiver {
 
 		@Override
 		public void onReceive(Context ctx, Intent intent) {
 			String action = intent.getAction();
-			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+			switch (action) {
+			case BluetoothDevice.ACTION_FOUND:
 				try {
 					BluetoothDevice device = intent
 							.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-					int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,
-							Short.MIN_VALUE);
-
-					Log.d(LCAT, "parcelname=" + device.getName());
-					Log.d(LCAT, "address=" + device.getAddress());
+					if (callback != null) {
+						KrollDict kd = new KrollDict();
+						kd.put("device", new BluetoothDeviceProxy(device,
+								false, true, false));
+						callback.call("onload", kd);
+					}
+					deviceList.add(device);
+					module.pairedDevices.addNearbyDevice(device);
+					Log.d(LCAT, ">>>>>  A=" + device.getAddress()
+							+ "         D="
+							+ (System.currentTimeMillis() - startTime)
+							+ "         N=" + device.getName());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				break;
+			case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+				Log.d(LCAT, "––––––––––––––––––––––––––––––––––");
+				startTime = System.currentTimeMillis();
+				deviceList.clear();
+				break;
+			case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+				if (!btAdapter.isDiscovering()) {
+					btAdapter.startDiscovery();
+				}
+				break;
 			}
 		}
+	}
 
-	};
+	final static String LCAT = A2dpModule.LCAT;
+	private Context ctx = TiApplication.getInstance().getApplicationContext();
+	BluetoothAdapter btAdapter;
+	KrollCallbacks callbacks;
+	private static A2dpModule module;
+	KrollCallbacks callback;
+
+	// better would be an interface ;-)
+	public static void setModule(A2dpModule _module) {
+		module = _module;
+
+	}
+
+	private final BroadcastReceiver discoveryResult = new DiscoveryResultHandler();
 
 	@Kroll.method
-	public void start(KrollDict opts) {
+	public void start(@Kroll.argument(optional = true) KrollDict opts) {
+		if (opts != null)
+			callback = new KrollCallbacks(this, opts);
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null || !btAdapter.isEnabled()) {
 			Log.e(LCAT, "btAdapter null or disabled");
 			return;
 		}
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		filter.addAction(BluetoothDevice.ACTION_FOUND);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		ctx.registerReceiver(discoveryResult, new IntentFilter(
-				BluetoothDevice.ACTION_FOUND));
+		ctx.registerReceiver(discoveryResult, filter);
 		if (!btAdapter.isDiscovering()) {
 			btAdapter.startDiscovery();
-			Log.d(LCAT, "discovery nearby started");
 		}
 	}
 
@@ -92,10 +124,14 @@ public class DiscoveryNearbyDevicesModule extends KrollModule {
 
 	private void tearDown() {
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
-		if (discoveryResult != null)
-			ctx.unregisterReceiver(discoveryResult);
+		if (discoveryResult != null) {
+			try {
+				ctx.unregisterReceiver(discoveryResult);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		if (btAdapter != null && btAdapter.isDiscovering())
 			btAdapter.cancelDiscovery();
 	}
-
 }

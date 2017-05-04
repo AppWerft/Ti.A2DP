@@ -12,13 +12,14 @@ import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 
-public final class DeviceScanner implements BluetoothProfile.ServiceListener {
-	BluetoothA2dp mBluetoothSpeaker;
+public final class BondedDevicesScanner implements
+		BluetoothProfile.ServiceListener {
+	BluetoothA2dp bluetoothSpeaker;
 	private A2dpModule module;
 	private final String LCAT = A2dpModule.LCAT;
 	int lastHashcode;
 
-	public DeviceScanner(A2dpModule module) {
+	public BondedDevicesScanner(A2dpModule module) {
 		this.module = module;
 	}
 
@@ -26,59 +27,51 @@ public final class DeviceScanner implements BluetoothProfile.ServiceListener {
 	public void onServiceConnected(int profile, BluetoothProfile proxy) {
 		KrollDict result = new KrollDict();
 		if (profile == BluetoothProfile.A2DP) {
+			// first variant:
 			final int[] states = new int[] { BluetoothProfile.STATE_CONNECTED,
 					BluetoothProfile.STATE_CONNECTING };
-			List<BluetoothDevice> connectedAd2dpDevices = new ArrayList<BluetoothDevice>();
+			List<BluetoothDevice> connectedDevices = new ArrayList<BluetoothDevice>();
 			if (profile == BluetoothProfile.A2DP) {
-				connectedAd2dpDevices.addAll(proxy
+				connectedDevices.addAll(proxy
 						.getDevicesMatchingConnectionStates(states));
 			}
-			// can be cast to a BluetoothA2dp instance
-			mBluetoothSpeaker = (BluetoothA2dp) proxy;
+			// second variant:
+			bluetoothSpeaker = (BluetoothA2dp) proxy;
+			List<BluetoothDevice> connectedA2dpDevices = bluetoothSpeaker
+					.getConnectedDevices();
+			for (BluetoothDevice dev : connectedA2dpDevices) {
+				// Log.d(LCAT, dev.getAddress() + "  " + dev.getName());
+			}
+
 			// get all bonded:
 			Set<BluetoothDevice> devices = module.btAdapter.getBondedDevices();
-			List<KrollDict> list = new ArrayList<KrollDict>();
+			List<PairedDevice> pairedDevices = new ArrayList<PairedDevice>();
 			for (BluetoothDevice device : devices) {
 				if (device.getType() == module.type
 						&& !device.getBluetoothClass().toString()
 								.equals("1f00")) {
-					KrollDict d = new KrollDict();
-					String name = device.getName();
-					d.put("name", name);
-					d.put("bondstate", device.getBondState());
-					d.put("address", device.getAddress());
 					boolean found = false;
-					for (BluetoothDevice connectedDevice : connectedAd2dpDevices) {
-						if (connectedDevice.getName().equals(name)) {
+					for (BluetoothDevice connectedDevice : connectedDevices) {
+						if (connectedDevice.getAddress().equals(
+								device.getAddress())) {
 							found = true;
 						}
 					}
-					d.put("connected", found);
-					list.add(d);
+					// module.pairedDevices.setDevice(device, found);
+					pairedDevices.add(new PairedDevice(device, found));
 				}
 			}
-
-			result.put("devices", list.toArray());
-
-			if (module.onReady != null) {
-				int hashCode = result.hashCode();
-				if (hashCode != lastHashcode) {
-					lastHashcode = hashCode;
-					module.onReady.call(module.getKrollObject(), result);
-				}
-			}
-
+			module.pairedDevices.setDevices(pairedDevices);
 			// http://stackoverflow.com/questions/5171248/programmatically-connect-to-paired-bluetooth-device
 			// no devices are connected
-			List<BluetoothDevice> connectedDevices = mBluetoothSpeaker
-					.getConnectedDevices();
+
 		}
 	}
 
 	@Override
 	public void onServiceDisconnected(int profile) {
 		if (profile == BluetoothProfile.A2DP) {
-			mBluetoothSpeaker = null;
+			bluetoothSpeaker = null;
 		}
 	}
 }
