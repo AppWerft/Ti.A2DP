@@ -2,17 +2,17 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 4.0.0
-apiversion: 4
-architectures: arm64-v8a armeabi-v7a x86
-description: Bluetooth A2DP Profile
+version: 1.0.2
+apiversion: 2
+architectures: armeabi armeabi-v7a x86
+description: Bluetooth A2DP Profile 
 author: Rainer Knöterich
 license: Specify your license
-copyright: Copyright (c) 2017 by
+copyright: Copyright (c) 2017 by 
 
 # these should not be edited
 name: a2dp
 moduleid: de.appwerft.a2dp
 guid: da6fcb7f-b847-4aad-94e0-bef58b6dd759
 platform: android
-minsdk: 7.0.0
+minsdk: 5.0.0.GA
