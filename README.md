@@ -21,9 +21,9 @@ var state = BT.Bluetooth.getAvailibility();
 ```
 The result can be:
 
-- [x] BT_NOTAVAILABLE 
-- [x] BT_DISABLED
-- [x] BT_ENABLED 
+* BT_NOTAVAILABLE 
+* BT_DISABLED
+* BT_ENABLED 
 
 In case two you can:
 ```javascript
@@ -53,7 +53,7 @@ If `true` the device is connected with least one device.
 
 ```javascript
 var A2DP = require("de.appwerft.a2dp");
-if (A2DP.init() {
+if (A2DP.init()) {
     A2DP.startScanPairedDevices({
     	repeat : true,
         onchanged : function(res) {
@@ -99,17 +99,17 @@ Typical answer:
 ### Constants
 
 #### Device types
-- [x] DEVICE_TYPE_CLASSIC   Bluetooth device type, Classic - BR/EDR devices 
-- [x] DEVICE_TYPE_DUAL      Bluetooth device type, Dual Mode - BR/EDR/LE 
-- [x] DEVICE_TYPE_LE        Bluetooth device type, Low Energy - LE-only 
-- [x] DEVICE_TYPE_UNKNOWN
+* DEVICE\_TYPE\_CLASSIC          Bluetooth device type, Classic - BR/EDR devices 
+* DEVICE\_TYPE_DUAL                  Bluetooth device type, Dual Mode - BR/EDR/LE 
+* DEVICE\_TYPE\_LE                        Bluetooth device type, Low Energy - LE-only 
+* DEVICE\_TYPE\_UNKNOWN
 
 
 #### Bond state
-@Kroll.constant
-- [x]  BOND_BONDED
-- [x]  BOND_BONDING
-- [x]  BOND_NONE
+
+* BOND\_BONDED
+*  BOND\_BONDING
+*  BOND\_NONE
 
 ### Test if A2DP active
 ```javascript
