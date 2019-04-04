@@ -100,7 +100,7 @@ public class A2dpModule extends KrollModule {
 			public void run() {
 				btAdapter.getProfileProxy(ctx, new BondedDevicesScanner(
 						A2dpModule.this), BluetoothProfile.A2DP);
-				handler.postDelayed(this, 1200);
+				handler.postDelayed(this, 12000);
 			}
 		};
 		handler.post(cronJob);
