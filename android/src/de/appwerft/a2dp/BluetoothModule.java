@@ -35,8 +35,8 @@ public class BluetoothModule extends KrollModule {
 		@Override
 		public void onResult(Activity arg0, int arg1, int arg2, Intent arg3) {
 			KrollDict kd = new KrollDict();
-			kd.put("name", btAdapter.getName());
-			kd.put("address", btAdapter.getAddress());
+		//	kd.put("name", btAdapter.getName());
+		//	kd.put("address", btAdapter.getAddress());
 			callbacks.call("onsuccess", kd);
 		}
 	}
