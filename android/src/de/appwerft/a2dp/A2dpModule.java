@@ -22,6 +22,7 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
@@ -158,5 +159,38 @@ public class A2dpModule extends KrollModule {
 		tearDown();
 		super.onStop(activity);
 	}
+	
+	
+	
+	
+	
+	
+	private BluetoothProfile.ServiceListener a2dpListener = new BluetoothProfile.ServiceListener() {
+		public void onServiceConnected(int profile, BluetoothProfile proxy) {
+			if (profile == BluetoothProfile.A2DP) {
+				bluetoothA2dp = (BluetoothA2dp) proxy;
+			}
+		}
+
+		public void onServiceDisconnected(int profile) {
+			if (profile == BluetoothProfile.A2DP) {
+				bluetoothA2dp = null;
+			}
+		}
+	};
+
+	public void BTinit() {
+		// Establish connection to the proxy.
+		bluetoothAdapter.getProfileProxy(ctx, headsetListener, BluetoothProfile.HEADSET);
+		bluetoothAdapter.getProfileProxy(ctx, a2dpListener, BluetoothProfile.A2DP);
+
+		// ... call functions on bluetoothHeadset
+
+		// Close proxy connection after use.
+		bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, bluetoothHeadset);
+		bluetoothAdapter.closeProfileProxy(BluetoothProfile.A2DP, bluetoothA2dp);
+
+	}
+
 
 }

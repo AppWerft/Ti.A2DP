@@ -1,5 +1,9 @@
 package de.appwerft.a2dp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -11,15 +15,16 @@ import org.appcelerator.titanium.util.TiActivitySupport;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import de.appwerft.a2dp.utils.KrollCallbacks;
 
 @Kroll.module(parentModule = A2dpModule.class)
 public class BluetoothModule extends KrollModule {
 	final static int REQUEST_CODE = 1;
-	final static int BT_NOTAVAILABLE = 0;
-	final static int BT_DISABLED = 1;
-	final static int BT_ENABLED = 2;
+	final static int NOTAVAILABLE = 0;
+	final static int DISABLED = 1;
+	final static int ENABLED = 2;
 	final static String LCAT = A2dpModule.LCAT;
 	BluetoothAdapter btAdapter;
 	KrollCallbacks callbacks;
@@ -47,6 +52,26 @@ public class BluetoothModule extends KrollModule {
 			btAdapter.disable();
 	}
 
+	@Kroll.method
+	public Object[] getBoundedDevices() {
+		ArrayList<HashMap> resList = new ArrayList<HashMap>();
+		Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+		if (pairedDevices.size() > 0) {
+			// There are paired devices. Get the name and address of each paired device.
+			for (BluetoothDevice device : pairedDevices) {
+				KrollDict dict = new KrollDict();
+				dict.put("devicename", device.getName());
+				dict.put("address", device.getAddress()); // MAC address
+				dict.put("type", device.getType());
+				dict.put("type", device.getType());
+				resList.add(dict);
+			}
+		}
+		return resList.toArray();
+	}
+
+	
+	
 	@Kroll.method
 	public boolean enableBluetooth(
 			@Kroll.argument(optional = true) KrollDict opts) {
@@ -85,10 +110,10 @@ public class BluetoothModule extends KrollModule {
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null) {
 			Log.d(LCAT, "getAvailibility btAdapter = null");
-			return BT_NOTAVAILABLE;
+			return NOTAVAILABLE;
 		} else {
 			Log.d(LCAT, "getAvailibility btAdapter = " + btAdapter.isEnabled());
-			return (btAdapter.isEnabled()) ? BT_ENABLED : BT_DISABLED;
+			return (btAdapter.isEnabled()) ? ENABLED : DISABLED;
 		}
 	}
 }
