@@ -179,18 +179,7 @@ public class A2dpModule extends KrollModule {
 		}
 	};
 
-	public void BTinit() {
-		// Establish connection to the proxy.
-		bluetoothAdapter.getProfileProxy(ctx, headsetListener, BluetoothProfile.HEADSET);
-		bluetoothAdapter.getProfileProxy(ctx, a2dpListener, BluetoothProfile.A2DP);
-
-		// ... call functions on bluetoothHeadset
-
-		// Close proxy connection after use.
-		bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, bluetoothHeadset);
-		bluetoothAdapter.closeProfileProxy(BluetoothProfile.A2DP, bluetoothA2dp);
-
-	}
+	
 
 
 }
