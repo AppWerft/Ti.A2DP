@@ -165,19 +165,7 @@ public class A2dpModule extends KrollModule {
 	
 	
 	
-	private BluetoothProfile.ServiceListener a2dpListener = new BluetoothProfile.ServiceListener() {
-		public void onServiceConnected(int profile, BluetoothProfile proxy) {
-			if (profile == BluetoothProfile.A2DP) {
-				bluetoothA2dp = (BluetoothA2dp) proxy;
-			}
-		}
-
-		public void onServiceDisconnected(int profile) {
-			if (profile == BluetoothProfile.A2DP) {
-				bluetoothA2dp = null;
-			}
-		}
-	};
+	
 
 	
 
