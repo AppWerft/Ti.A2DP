@@ -21,10 +21,16 @@ import de.appwerft.a2dp.utils.KrollCallbacks;
 
 @Kroll.module(parentModule = A2dpModule.class)
 public class BluetoothModule extends KrollModule {
+	
 	final static int REQUEST_CODE = 1;
+	
+	@Kroll.constant
 	final static int NOTAVAILABLE = 0;
+	@Kroll.constant
 	final static int DISABLED = 1;
+	@Kroll.constant
 	final static int ENABLED = 2;
+	
 	final static String LCAT = A2dpModule.LCAT;
 	BluetoothAdapter btAdapter;
 	KrollCallbacks callbacks;
