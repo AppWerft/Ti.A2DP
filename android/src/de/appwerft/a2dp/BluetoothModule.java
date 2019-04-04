@@ -51,7 +51,7 @@ public class BluetoothModule extends KrollModule {
 		if (btAdapter != null)
 			btAdapter.disable();
 	}
-
+/*
 	@Kroll.method
 	public Object[] getBoundedDevices() {
 		ArrayList<HashMap> resList = new ArrayList<HashMap>();
@@ -70,7 +70,7 @@ public class BluetoothModule extends KrollModule {
 		return resList.toArray();
 	}
 
-	
+	*/
 	
 	@Kroll.method
 	public boolean enableBluetooth(
