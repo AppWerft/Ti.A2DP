@@ -102,7 +102,7 @@ public class BluetoothModule extends KrollModule {
 
 	@Kroll.method
 	public boolean isEnabled() {
-		return (getAvailibility() == BT_ENABLED) ? true : false;
+		return (getAvailibility() == ENABLED) ? true : false;
 	}
 
 	@Kroll.method
